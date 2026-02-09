@@ -253,7 +253,7 @@ public class DosLoader extends AbstractLibrarySupportLoader {
 				int len = relocationType.getLength();
 				addr = addr.add(header.e_lfarlc());
 				for (int i = 0; i < relocations.size(); i++) {
-					monitor.checkCanceled();
+					monitor.checkCancelled();
 					DataUtilities.createData(program, addr.add(i * len), relocationType, -1, false,
 						DataUtilities.ClearDataMode.CHECK_FOR_SPACE);
 				}
@@ -544,7 +544,7 @@ public class DosLoader extends AbstractLibrarySupportLoader {
 		BinaryReader reader = mz.getBinaryReader();
 
 		for (MzRelocation relocation : mz.getRelocations()) {
-			monitor.checkCanceled();
+			monitor.checkCancelled();
 
 			int seg = relocation.getSegment();
 			int off = relocation.getOffset();

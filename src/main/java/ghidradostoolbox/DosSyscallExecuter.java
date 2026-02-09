@@ -268,7 +268,7 @@ public class DosSyscallExecuter {
 	private void getSyscallsInFunctions(FunctionIterator funcs) throws CancelledException {
 		funcsToCalls = new HashMap<>();
 		for (Function func : funcs) {
-			monitor.checkCanceled();
+			monitor.checkCancelled();
 			for (Instruction inst : program.getListing().getInstructions(func.getBody(), true)) {
 				try {
 					if (inst.getBytes()[0] == -51) {
