@@ -31,6 +31,7 @@ import ghidra.app.util.bin.format.mz.OldDOSHeader;
 */
 import ghidra.app.util.importer.MessageLog;
 import ghidra.app.util.opinion.AbstractLibrarySupportLoader;
+import ghidra.app.util.opinion.Loader.ImporterSettings;
 import ghidra.app.util.opinion.LoadSpec;
 import ghidra.app.util.opinion.QueryOpinionService;
 import ghidra.app.util.opinion.QueryResult;
@@ -116,9 +117,9 @@ public class DosLoader extends AbstractLibrarySupportLoader {
 
 	@Override
 	public List<Option> getDefaultOptions(ByteProvider provider, LoadSpec loadSpec,
-			DomainObject domainObject, boolean isLoadIntoProgram) {
+			DomainObject domainObject, boolean isLoadIntoProgram, boolean mirrorFsLayout) {
 		List<Option> list =
-			super.getDefaultOptions(provider, loadSpec, domainObject, isLoadIntoProgram);
+			super.getDefaultOptions(provider, loadSpec, domainObject, isLoadIntoProgram, mirrorFsLayout);
 
 		/* These only applies to first loaded program, not when we add to the program */
 		if(!isLoadIntoProgram) {
@@ -178,10 +179,19 @@ public class DosLoader extends AbstractLibrarySupportLoader {
 	}
 
 	@Override
-	public void load(ByteProvider provider, LoadSpec loadSpec, List<Option> options,
-			Program program, TaskMonitor monitor, MessageLog log)
+	public void load(Program program, ImporterSettings settings)
 			throws IOException, CancelledException {
-		FileBytes fileBytes = MemoryBlockUtils.createFileBytes(program, provider, monitor);
+		ByteProvider provider = settings.provider();
+		TaskMonitor monitor = settings.monitor();
+		MessageLog log = settings.log();
+		List<Option> options = settings.options();
+
+		FileBytes fileBytes = program.getMemory().createFileBytes(provider.getName(),
+				0,
+				provider.length(),
+				provider.getInputStream(0),
+				monitor);
+
 		AddressFactory af = program.getAddressFactory();
 		if (!(af.getDefaultAddressSpace() instanceof SegmentedAddressSpace)) {
 			throw new IOException("Selected Language must have a segmented address space.");
